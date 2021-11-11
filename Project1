@@ -1,0 +1,78 @@
+"""
+Created on Wed Nov 10 11:50:21 2021
+@author: alexlook
+"""
+import csv
+import math
+import matplotlib.pyplot as plt
+def file_processing(filename):
+    infile = open(filename, "r")
+    csv_reader = csv.reader(infile, delimiter = ",")
+    lst = []
+    for line in csv_reader:
+        lst.append(line)
+        
+    return lst
+
+def storing_closing(filename):
+    file = file_processing(filename)
+    file.pop(0)
+    adj_list = []
+    for i in file:
+        adj_closing = i.pop(5)
+        adj_list.append(adj_closing)
+        
+    return adj_list
+        
+def lst_momentum_year(filename):
+    lst = storing_closing(filename)
+    momentum_lst = []
+    i = 0
+    for item in lst:
+        # if i >= len(lst)/2:
+        #     break
+        if i > 0:
+            momentum = (float(lst[i]) - float(lst[i-1])) / float(lst[i-1])
+            momentum_lst.append(momentum)
+            i += 1
+        else:
+            i += 1
+    return momentum_lst
+        
+def average_pct_change(filename):
+    lst = lst_momentum_year(filename)
+    total = 0
+    i = 0
+    for pct in lst:
+        total += pct
+        i +=1
+    
+    return total
+def main():
+    
+    print(file_processing("/Users/alexlook/Downloads/AAPL (4).csv")[0])
+    print(storing_closing("/Users/alexlook/Downloads/AAPL (4).csv"))
+    print(lst_momentum_year("/Users/alexlook/Downloads/AAPL (4).csv"))
+    print(average_pct_change("/Users/alexlook/Downloads/AAPL (4).csv"))
+    
+    # this plot shows cumulative percentages laid on top of each other
+    lst = lst_momentum_year("/Users/alexlook/Downloads/AAPL (4).csv")
+    plt.figure()
+    y = 0
+    cumulative_pct = 0
+    for i in lst:
+        cumulative_pct += float(i)
+        if i > 0:
+            plt.plot(y, cumulative_pct, ".", markersize = 1, color = "green")
+        if i < 0:
+            plt.plot(y, cumulative_pct, ".", markersize = 1, color = "red")
+        y += 1
+    
+    lst = storing_closing("/Users/alexlook/Downloads/AAPL (4).csv")
+    plt.figure()
+    y = 0
+    for i in lst:
+        plt.plot(y, i, ".", markersize = 1, color = "blue")
+        y += 1
+main()
+    
