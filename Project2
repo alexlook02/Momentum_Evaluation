@@ -1,0 +1,344 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Nov 10 11:50:21 2021
+@author: alexlook
+"""
+import csv
+import matplotlib.pyplot as plt
+def file_processing(filename):
+    infile = open(filename, "r")
+    csv_reader = csv.reader(infile, delimiter = ",")
+    lst = []
+    for line in csv_reader:
+        lst.append(line)
+        
+    return lst
+
+def storing_closing(filename):
+    file = file_processing(filename)
+    file.pop(0)
+    adj_list = []
+    for i in file:
+        adj_closing = i.pop(5)
+        adj_list.append(adj_closing)
+        
+    return adj_list
+        
+def lst_momentum_year(filename):
+    lst = storing_closing(filename)
+    momentum_lst = []
+    i = 0
+    for item in lst:
+        # if i >= len(lst)/2:
+        #     break
+        if i > 0:
+            momentum = (float(lst[i]) - float(lst[i-1])) / float(lst[i-1]) 
+            momentum_lst.append(momentum)
+            i += 1
+        else:
+            i += 1
+    return momentum_lst
+        
+def average_pct_change(filename):
+    lst = lst_momentum_year(filename)
+    total = 0
+    i = 0
+    for pct in lst:
+        total += pct
+        i +=1
+    
+    return total
+
+def moving_average_5_days(filename):
+    lst = storing_closing(filename)
+    moving_avg = []
+    i = 0
+    total = 0
+    while True:
+        if i == len(lst):
+                break
+        if i < 4:
+            total += float(lst[i])
+        if i == 5:
+            total += float(lst[i])
+            avg = total/5
+            moving_avg.append(avg)
+        if i > 5:
+            total -= float(lst[i-5])
+            total += float(lst[i])
+            avg = total/5
+            moving_avg.append(avg)
+            
+        i += 1
+        
+    return moving_avg
+    
+def moving_average_20_days(filename):
+    lst = storing_closing(filename)
+    moving_avg = []
+    i = 0
+    total = 0
+    while True:
+        if i == len(lst):
+                break
+        if i < 19:
+            total += float(lst[i])
+        if i == 19:
+            total += float(lst[i])
+            avg = total/20
+            moving_avg.append(avg)
+        if i > 19:
+            total -= float(lst[i-20])
+            total += float(lst[i])
+            avg = total/20
+            moving_avg.append(avg)
+            
+        i += 1
+        
+    return moving_avg
+
+def moving_average_100_days(filename):
+    lst = storing_closing(filename)
+    moving_avg = []
+    i = 0
+    total = 0
+    while True:
+        if i == len(lst):
+                break
+        if i < 98:
+            total += float(lst[i])
+        if i == 99:
+            total += float(lst[i])
+            avg = total/100
+            moving_avg.append(avg)
+        if i > 99:
+            total -= float(lst[i-100])
+            total += float(lst[i])
+            avg = total/100
+            moving_avg.append(avg)
+            
+        i += 1
+        
+    return moving_avg
+
+def momentum_line(filename):
+    lst = storing_closing(filename)
+    momentum_lst = []
+    i = 0
+    
+    while True:
+        if i >= 20:
+            if i == len(lst):
+                break
+            momentum = float(lst[i]) - float(lst[i - 20])
+            momentum_lst.append(momentum)
+        i += 1
+    return momentum_lst
+
+def momentum_evaluation_2_years(filename):
+    lst = moving_average_20_days(filename)
+    start = float(lst[0])
+    end = float(lst[len(lst)-1])
+    return (end - start) / start / len(lst)
+
+def momentum_evaluation(filename):
+    lst = moving_average_5_days(filename)
+    momentum_change = []
+    start_2y = float(lst[0])
+    start_1y = float(lst[int(len(lst)-127-(len(lst)-127)/2)])
+    start_6m = float(lst[int(len(lst)-127-(len(lst)-127)/4)])
+    start_3m = float(lst[int(len(lst)-127-(len(lst)-127)/8)])
+    start_1m = float(lst[int(len(lst)-127-(len(lst)-127)/24)])
+    start_2w = float(lst[int(len(lst)-127-(len(lst)-127)/48)])
+    start_1w = float(lst[int(len(lst)-127-(len(lst)-127)/96)])
+    end = float(lst[len(lst)-127])
+    momentum_2y = (end - start_2y) / 504
+    momentum_1y = (end - start_1y) / 252
+    momentum_6m = (end - start_6m) / 126
+    momentum_3m = (end - start_3m) / 63
+    momentum_1m = (end - start_1m) / 21
+    momentum_2w = (end - start_2w) / 10.2
+    momentum_1w = (end - start_1w) / 5.1
+    momentum_change.append(momentum_2y)
+    momentum_change.append(momentum_1y)
+    momentum_change.append(momentum_6m)
+    momentum_change.append(momentum_3m)
+    momentum_change.append(momentum_1m)
+    momentum_change.append(momentum_2w)
+    momentum_change.append(momentum_1w)
+    return momentum_change
+
+def momentum_graph(filename):
+    
+    plt.figure()
+    plt.xlabel("Trading Days")
+    plt.ylabel("20 Day Momentum")
+    plt.title("20 Day Momentum Graph")
+    lst = momentum_line("/Users/alexlook/Downloads/AAPL (5).csv")
+    i = 0
+    y = 10
+    while True:
+        if i == len(lst)-126:
+            break
+        plt.plot(y, lst[i], ".", markersize = 3, color = "red")
+        y += 1
+        i += 1
+    y = 0
+    while True:
+        plt.plot(y , 0, ".", markersize = 1, color = "black")
+        y += 1
+        if y == len(lst)-116:
+            break
+    return plt.figure()
+
+def moving_averages_graph(filename):
+    lst = moving_average_5_days(filename)
+    plt.figure()
+    
+    y = 0
+    for item in lst:
+        plt.plot(y, item, ".", markersize = 1, color = "blue")
+        y += 1
+    plt.plot(y, lst[0], ".", markersize = 1, color = "blue", label = "5 Day Moving Average")
+        
+    lst = moving_average_20_days(filename)
+    y = 20
+    for item in lst:
+        plt.plot(y, item, ".", markersize = 1, color = "green")
+        y += 1
+    plt.plot(20, lst[0], ".", markersize = 1, color = "green", label = "20 Day Moving Average")
+
+    lst = moving_average_100_days(filename)
+    plt.ylabel("Price")
+    plt.xlabel("Trading Days")
+    plt.title("Different Moving Averages Measurements")
+    y = 100
+    for item in lst:
+        plt.plot(y, item, ".", markersize = 1, color = "red")
+        y += 1
+        
+    plt.plot(100, lst[0], ".", markersize = 1, color = "red", label = "100 Day Moving Average")
+    plt.legend()
+    
+    return plt.figure()
+
+def stock_price_graph(filename):
+    lst = storing_closing(filename)
+    plt.figure()
+    plt.xlabel("Trading Days")
+    plt.ylabel("Percent Change (%)")
+    plt.title("% Price Change for Apple Stock by Day")
+    y = 0
+    i = 0
+
+    while True:
+
+        if i == len(lst):
+            break
+        pct = 0
+        pct += (float(lst[i]) - float(lst[0])) / float(lst[0]) * 100
+        if float(lst[i]) > float(lst[i-1]):
+            
+            plt.plot(y, pct, ".", markersize = 1, color = "green")
+        if float(lst[i]) < float(lst[i-1]):
+
+             plt.plot(y, pct, ".", markersize = 1, color = "red")
+
+        i += 1
+        y += 1
+    
+    return plt.figure()
+
+def moving_average_comparison(filename):
+    lst = moving_average_5_days(filename)
+    i = len(lst)-126
+    y = 0
+    plt.figure()
+    plt.xlabel("Trading Days")
+    plt.ylabel("Simple Moving Average (5 Days)")
+    plt.title("Projected vs Actual Returns")
+    while True:
+        if i == len(lst):
+            break
+        plt.plot(y, lst[i], "o", markersize = 2, color = "black")
+        i += 1
+        y += 1
+    plt.plot(y, lst[i - 1], "*", markersize = 5, color = "black", label = "Actual Returns")
+    lst1 = momentum_evaluation(filename)
+    i = 0
+    y = 0
+    while True:
+        if i == 126:
+            break
+        plt.plot(y, lst[len(lst)-126] + lst1[0] * i, ".", markersize = 1, color = "blue")
+        plt.plot(y, lst[len(lst)-126] + lst1[1] * i, ".", markersize = 1, color = "red")
+        plt.plot(y, lst[len(lst)-126] + lst1[2] * i, ".", markersize = 1, color = "green")
+        plt.plot(y, lst[len(lst)-126] + lst1[3] * i, ".", markersize = 1, color = "orange")
+        plt.plot(y, lst[len(lst)-126] + lst1[4] * i, ".", markersize = 1, color = "pink")
+        plt.plot(y, lst[len(lst)-126] + lst1[5] * i, ".", markersize = 1, color = "purple")
+        plt.plot(y, lst[len(lst)-126] + lst1[6] * i, ".", markersize = 1, color = "yellow")
+        i += 1
+        y += 1
+        
+    plt.plot(y, lst[len(lst)-126] + lst1[0] * i, "*", markersize = 5, color = "blue", label = "2 years")
+    plt.plot(y, lst[len(lst)-126] + lst1[1] * i, "*", markersize = 5, color = "red", label = "1 year")
+    plt.plot(y, lst[len(lst)-126] + lst1[2] * i, "*", markersize = 5, color = "green", label = "6 months")
+    plt.plot(y, lst[len(lst)-126] + lst1[3] * i, "*", markersize = 5, color = "orange", label = "3 months")
+    plt.plot(y, lst[len(lst)-126] + lst1[4] * i, "*", markersize = 5, color = "pink", label = "1 month")
+    plt.plot(y, lst[len(lst)-126] + lst1[5] * i, "*", markersize = 5, color = "purple", label = "2 weeks")
+    plt.plot(y, lst[len(lst)-126] + lst1[6] * i, "*", markersize = 5, color = "yellow", label = "1 week")
+    plt.legend()
+    return plt.figure()
+
+def moving_average_comparison_zoomed(filename):
+    lst = moving_average_5_days(filename)
+    i = len(lst)-126
+    y = 0
+    plt.figure()
+    plt.xlabel("Trading Days")
+    plt.ylabel("Simple Moving Average (5 Days)")
+    plt.title("Projected vs Actual Returns Zoomed")
+    while True:
+        if i == len(lst):
+            break
+        plt.plot(y, lst[i], "o", markersize = 2, color = "black")
+        i += 1
+        y += 1
+    plt.plot(y, lst[i - 1], "*", markersize = 5, color = "black", label = "Actual Returns")
+    lst1 = momentum_evaluation(filename)
+    i = 0
+    y = 0
+    while True:
+        if i == 126:
+            break
+        plt.plot(y, lst[len(lst)-126] + lst1[0] * i, ".", markersize = 1, color = "blue")
+        plt.plot(y, lst[len(lst)-126] + lst1[1] * i, ".", markersize = 1, color = "red")
+        plt.plot(y, lst[len(lst)-126] + lst1[2] * i, ".", markersize = 1, color = "green")
+        plt.plot(y, lst[len(lst)-126] + lst1[3] * i, ".", markersize = 1, color = "orange")
+        i += 1
+        y += 1
+        
+    plt.plot(y, lst[len(lst)-126] + lst1[0] * i, "*", markersize = 5, color = "blue", label = "2 years")
+    plt.plot(y, lst[len(lst)-126] + lst1[1] * i, "*", markersize = 5, color = "red", label = "1 year")
+    plt.plot(y, lst[len(lst)-126] + lst1[2] * i, "*", markersize = 5, color = "green", label = "6 months")
+    plt.plot(y, lst[len(lst)-126] + lst1[3] * i, "*", markersize = 5, color = "orange", label = "3 months")
+    plt.legend()
+    return plt.figure()
+
+def apple_showcase(filename):
+    stock_price_graph(filename)
+    moving_averages_graph(filename)
+    momentum_graph(filename)
+    moving_average_comparison(filename)
+    moving_average_comparison_zoomed(filename)
+    
+    return plt.figure
+
+def main():
+    
+    apple_showcase("/Users/alexlook/Downloads/AAPL (5).csv")
+    
+
+main()
+    
