@@ -1,0 +1,851 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Nov 10 11:50:21 2021
+@author: alexlook
+"""
+
+# Here we are importing in the necessary modules that we will be using throughout the project
+import csv
+import matplotlib.pyplot as plt
+
+# This first funciton is purely made to read the files that we have downloaded,
+# converting the files from an excel file into something else that we can use
+def file_processing(filename):
+    ''' parameters: a csv file
+        returns: a list
+    '''
+    infile = open(filename, "r")
+    csv_reader = csv.reader(infile, delimiter = ",")
+    lst = []
+    for line in csv_reader:
+        lst.append(line)
+        
+    return lst
+
+# This fucniton is meant to strip out unnessacary parts and focus on purely the
+# adjusted closing prices for each file. Because all the files that we
+# have haved should have the same days of trading etc. this function can be 
+# used universally for all the files that we have downloaded
+def storing_closing(filename):
+    ''' parameters: file_processing (a list)
+        returns: adj_lst (a list)
+    '''
+    
+    file = file_processing(filename)
+    file.pop(0)
+    adj_list = []
+    for i in file:
+        adj_closing = i.pop(5)
+        adj_list.append(adj_closing)
+        
+    return adj_list
+
+def moving_average_5_days(filename):
+    ''' parameters: a csv file
+        returns: a list
+    '''
+    
+    lst = storing_closing(filename)
+    moving_avg = []
+    i = 0
+    total = 0
+    while True:
+        if i == len(lst):
+                break
+        if i < 4:
+            total += float(lst[i])
+        if i == 5:
+            total += float(lst[i])
+            avg = total/5
+            moving_avg.append(avg)
+        if i > 5:
+            total -= float(lst[i-5])
+            total += float(lst[i])
+            avg = total/5
+            moving_avg.append(avg)
+            
+        i += 1
+        
+    return moving_avg
+    
+def moving_average_20_days(filename):
+    ''' parameters: a csv file
+        returns: a list
+    '''
+    
+    lst = storing_closing(filename)
+    moving_avg = []
+    i = 0
+    total = 0
+    while True:
+        if i == len(lst):
+                break
+        if i < 19:
+            total += float(lst[i])
+        if i == 19:
+            total += float(lst[i])
+            avg = total/20
+            moving_avg.append(avg)
+        if i > 19:
+            total -= float(lst[i-20])
+            total += float(lst[i])
+            avg = total/20
+            moving_avg.append(avg)
+            
+        i += 1
+        
+    return moving_avg
+
+def moving_average_100_days(filename):
+    ''' parameters: a csv file
+        returns: a list
+    '''
+    
+    lst = storing_closing(filename)
+    moving_avg = []
+    i = 0
+    total = 0
+    while True:
+        if i == len(lst):
+                break
+        if i < 98:
+            total += float(lst[i])
+        if i == 99:
+            total += float(lst[i])
+            avg = total/100
+            moving_avg.append(avg)
+        if i > 99:
+            total -= float(lst[i-100])
+            total += float(lst[i])
+            avg = total/100
+            moving_avg.append(avg)
+            
+        i += 1
+        
+    return moving_avg
+
+def momentum_line(filename):
+    ''' parameters: a list
+        returns: a list
+    '''
+    
+    lst = storing_closing(filename)
+    momentum_lst = []
+    i = 0
+    
+    while True:
+        if i >= 20:
+            if i == len(lst):
+                break
+            momentum = float(lst[i]) - float(lst[i - 20])
+            momentum_lst.append(momentum)
+        i += 1
+    return momentum_lst
+
+def sma_pct_changes_20_day(filename):
+    ''' parameters: a list
+        returns: a list
+    '''
+    lst = moving_average_20_days(filename)
+    final_lst = []
+    lst_2_year = lst[:(len(lst)-126)]
+    lst_1_year = lst[int(round((len(lst)-126)/2,0)):(len(lst)-126)]
+    lst_6_months = lst[int(round((len(lst)-126)/4*3,0)):(len(lst)-126)]
+    lst_3_months = lst[int(round((len(lst)-126)*7/8,0)):(len(lst)-126)]
+    lst_1_months = lst[int(round((len(lst)-126)*23/24,0)):(len(lst)-126)]
+    lst_2_week = lst[int(round((len(lst)-126)*47/48,0)):(len(lst)-126)]
+    lst_1_week = lst[int(round((len(lst)-126)*95/96,0)):(len(lst)-126)]
+    
+    total = 0
+    i = 0
+    while True:
+        if i > 0:
+            total += (lst_2_year[i]-lst_2_year[i-1])/lst_2_year[i-1]
+            i += 1
+        else:
+            i += 1
+        if i == len(lst_2_year):
+            break
+    final_lst.append(total/(len(lst_2_year)-1))
+
+    total = 0
+    i = 0
+    while True:
+        if i > 0:
+            total += (lst_1_year[i]-lst_1_year[i-1])/lst_1_year[i-1]
+            i += 1
+        else:
+            i += 1
+        if i == len(lst_1_year):
+            break
+    final_lst.append(total/(len(lst_1_year)-1))
+    
+    total = 0
+    i = 0
+    while True:
+        if i > 0:
+            total += (lst_6_months[i]-lst_6_months[i-1])/lst_6_months[i-1]
+            i += 1
+        else:
+            i += 1
+        if i == len(lst_6_months):
+            break
+    final_lst.append(total/(len(lst_6_months)-1))
+    
+    total = 0
+    i = 0
+    while True:
+        if i > 0:
+            total += (lst_3_months[i]-lst_3_months[i-1])/lst_3_months[i-1]
+            i += 1
+        else:
+            i += 1
+        if i == len(lst_3_months):
+            break
+    final_lst.append(total/(len(lst_3_months)-1))
+    
+    total = 0
+    i = 0
+    while True:
+        if i > 0:
+            total += (lst_1_months[i]-lst_1_months[i-1])/lst_1_months[i-1]
+            i += 1
+        else:
+            i += 1
+        if i == len(lst_1_months):
+            break
+    final_lst.append(total/(len(lst_1_months)-1))
+    
+    total = 0
+    i = 0
+    while True:
+        if i > 0:
+            total += (lst_2_week[i]-lst_2_week[i-1])/lst_2_week[i-1]
+            i += 1
+        else:
+            i += 1
+        if i == len(lst_2_week):
+            break
+    final_lst.append(total/(len(lst_2_week)-1))
+    
+    total = 0
+    i = 0
+    while True:
+        if i > 0:
+            total += (lst_1_week[i]-lst_1_week[i-1])/lst_1_week[i-1]
+            i += 1
+        else:
+            i += 1
+        if i == len(lst_1_week):
+            break
+    final_lst.append(total/(len(lst_1_week)-1))
+    
+    return final_lst
+
+def momentum_graph(filename):
+    ''' parameters: a list
+        returns: a figure
+    '''
+    
+    plt.figure()
+    plt.xlabel("Trading Days")
+    plt.ylabel("20 Day Momentum")
+    plt.title("20 Day Momentum Graph")
+    lst = momentum_line(filename)
+    i = 0
+    y = 10
+    while True:
+        if i == len(lst):
+            break
+        plt.plot(y, lst[i], ".", markersize = 3, color = "red")
+        y += 1
+        i += 1
+    y = 0
+    while True:
+        plt.plot(y , 0, ".", markersize = 1, color = "black")
+        y += 1
+        if y == len(lst):
+            break
+    return plt.figure()
+
+def moving_averages_graph(filename):
+    ''' parameters: a list
+        returns: a figure
+    '''
+    
+    lst = moving_average_5_days(filename)
+    plt.figure()
+    
+    y = 0
+    for item in lst:
+        plt.plot(y, item, ".", markersize = 1, color = "blue")
+        y += 1
+    plt.plot(y, lst[0], ".", markersize = 1, color = "blue", label = "5 Day Moving Average")
+        
+    lst = moving_average_20_days(filename)
+    y = 20
+    for item in lst:
+        plt.plot(y, item, ".", markersize = 1, color = "green")
+        y += 1
+    plt.plot(20, lst[0], ".", markersize = 1, color = "green", label = "20 Day Moving Average")
+
+    lst = moving_average_100_days(filename)
+    plt.ylabel("Price")
+    plt.xlabel("Trading Days")
+    plt.title("Different Moving Averages Measurements")
+    y = 100
+    for item in lst:
+        plt.plot(y, item, ".", markersize = 1, color = "red")
+        y += 1
+        
+    plt.plot(100, lst[0], ".", markersize = 1, color = "red", label = "100 Day Moving Average")
+    plt.legend()
+    
+    return plt.figure()
+
+def stock_price_graph(filename):
+    ''' parameters: a list
+        returns: a figure
+    '''
+    
+    lst = storing_closing(filename)
+    plt.figure()
+    plt.xlabel("Trading Days")
+    plt.ylabel("Percent Change (%)")
+    plt.title("% Price Change for JP Morgan Stock by Day")
+    y = 0
+    i = 0
+
+    while True:
+
+        if i == len(lst):
+            break
+        pct = 0
+        pct += (float(lst[i]) - float(lst[0])) / float(lst[0]) * 100
+        if float(lst[i]) > float(lst[i-1]):
+            
+            plt.plot(y, pct, ".", markersize = 1, color = "green")
+        if float(lst[i]) < float(lst[i-1]):
+
+             plt.plot(y, pct, ".", markersize = 1, color = "red")
+
+        i += 1
+        y += 1
+    
+    return plt.figure()
+
+def moving_average_comparison(filename):
+    ''' parameters: a list
+        returns: a figure
+    '''
+    
+    lst = moving_average_20_days(filename)
+    i = len(lst)-126
+    y = 0
+    plt.figure()
+    plt.xlabel("Trading Days")
+    plt.ylabel("Simple Moving Average (20 Days)")
+    plt.title("Projected vs Actual Returns")
+    while True:
+        if i == len(lst):
+            break
+        plt.plot(y, lst[i], "o", markersize = 2, color = "black")
+        i += 1
+        y += 1
+    plt.plot(y, lst[i - 1], "*", markersize = 5, color = "black", label = "Actual Returns")
+    lst1 = sma_pct_changes_20_day(filename)
+    i = 0
+    y = 0
+    while True:
+        if i == 126:
+            break
+        plt.plot(y, lst[len(lst)-126] * (1 + lst1[0])**i, ".", markersize = 1, color = "blue")
+        plt.plot(y, lst[len(lst)-126] * (1 + lst1[1]) ** i, ".", markersize = 1, color = "red")
+        plt.plot(y, lst[len(lst)-126] * (1 + lst1[2]) ** i, ".", markersize = 1, color = "green")
+        plt.plot(y, lst[len(lst)-126] * (1 + lst1[3]) ** i, ".", markersize = 1, color = "orange")
+        plt.plot(y, lst[len(lst)-126] * (1 + lst1[4]) ** i, ".", markersize = 1, color = "pink")
+        plt.plot(y, lst[len(lst)-126] * (1 + lst1[5]) ** i, ".", markersize = 1, color = "purple")
+        plt.plot(y, lst[len(lst)-126] * (1 + lst1[6]) ** i, ".", markersize = 1, color = "yellow")
+        i += 1
+        y += 1
+        
+    plt.plot(y, lst[len(lst)-126] * (1 + lst1[0]) ** i, "*", markersize = 5, color = "blue", label = "2 years")
+    plt.plot(y, lst[len(lst)-126] * (1 + lst1[1]) ** i, "*", markersize = 5, color = "red", label = "1 year")
+    plt.plot(y, lst[len(lst)-126] * (1 + lst1[2]) ** i, "*", markersize = 5, color = "green", label = "6 months")
+    plt.plot(y, lst[len(lst)-126] * (1 + lst1[3]) ** i, "*", markersize = 5, color = "orange", label = "3 months")
+    plt.plot(y, lst[len(lst)-126] * (1 + lst1[4]) ** i, "*", markersize = 5, color = "pink", label = "1 month")
+    plt.plot(y, lst[len(lst)-126] * (1 + lst1[5]) ** i, "*", markersize = 5, color = "purple", label = "2 weeks")
+    plt.plot(y, lst[len(lst)-126] * (1 + lst1[6]) ** i, "*", markersize = 5, color = "yellow", label = "1 week")
+    plt.legend()
+    return plt.figure()
+
+def moving_average_comparison_zoomed(filename):
+    lst = moving_average_20_days(filename)
+    i = len(lst)-126
+    y = 0
+    plt.figure()
+    plt.xlabel("Trading Days")
+    plt.ylabel("Simple Moving Average (20 Days)")
+    plt.title("Projected vs Actual Returns Zoomed")
+    while True:
+        if i == len(lst):
+            break
+        plt.plot(y, lst[i], "o", markersize = 2, color = "black")
+        i += 1
+        y += 1
+    plt.plot(y, lst[i - 1], "*", markersize = 5, color = "black", label = "Actual Returns")
+    lst1 = sma_pct_changes_20_day(filename)
+    i = 0
+    y = 0
+    while True:
+        if i == 126:
+            break
+        plt.plot(y, lst[len(lst)-126] * (1 + lst1[0])**i, ".", markersize = 1, color = "blue")
+        plt.plot(y, lst[len(lst)-126] * (1 + lst1[1]) ** i, ".", markersize = 1, color = "red")
+        # plt.plot(y, lst[len(lst)-126] * (1 + lst1[2]) ** i, ".", markersize = 1, color = "green")
+        # plt.plot(y, lst[len(lst)-126] * (1 + lst1[3]) ** i, ".", markersize = 1, color = "orange")
+        plt.plot(y, lst[len(lst)-126] * (1 + lst1[4]) ** i, ".", markersize = 1, color = "pink")
+        plt.plot(y, lst[len(lst)-126] * (1 + lst1[5]) ** i, ".", markersize = 1, color = "purple")
+        # plt.plot(y, lst[len(lst)-126] * (1 + lst1[6]) ** i, ".", markersize = 1, color = "yellow")
+        i += 1
+        y += 1
+        
+    plt.plot(y, lst[len(lst)-126] * (1 + lst1[0]) ** i, "*", markersize = 5, color = "blue", label = "2 years")
+    plt.plot(y, lst[len(lst)-126] * (1 + lst1[1]) ** i, "*", markersize = 5, color = "red", label = "1 year")
+    # plt.plot(y, lst[len(lst)-126] * (1 + lst1[2]) ** i, "*", markersize = 5, color = "green", label = "6 months")
+    # plt.plot(y, lst[len(lst)-126] * (1 + lst1[3]) ** i, "*", markersize = 5, color = "orange", label = "3 months")
+    plt.plot(y, lst[len(lst)-126] * (1 + lst1[4]) ** i, "*", markersize = 5, color = "pink", label = "1 month")
+    plt.plot(y, lst[len(lst)-126] * (1 + lst1[5]) ** i, "*", markersize = 5, color = "purple", label = "2 weeks")
+    # plt.plot(y, lst[len(lst)-126] * (1 + lst1[6]) ** i, "*", markersize = 5, color = "yellow", label = "1 week")
+    plt.legend()
+    return plt.figure()
+
+# This funciton to 
+def stock_showcase(filename):
+    stock_price_graph(filename)
+    moving_averages_graph(filename)
+    momentum_graph(filename)
+    moving_average_comparison(filename)
+    moving_average_comparison_zoomed(filename)
+    
+    return plt.figure
+
+# This calculates the variance of our actual returns which will later be used 
+# to find the correlation between our expected and actual data
+def stddev_benchmark(filename):
+    lst = moving_average_20_days(filename)
+    lst = lst[(len(lst)-126):]
+    total = 0
+    stddev = []
+    for item in lst:
+        total += item
+    mean = total / len(lst)
+    total_for_var = 0
+    for item in lst:
+        total_for_var += (mean - item)**2
+    stddev.append((total_for_var/len(lst))**(1/2))
+    return stddev
+    
+def stddev_stock(filename):
+    start = moving_average_20_days(filename)
+    lst_change = sma_pct_changes_20_day(filename)
+    lst = []
+    i = 0
+    while True:
+        if i == 126:
+            break
+        lst.append(start[len(start)-126] * (1 + lst_change[0]) ** i)
+        i += 1
+    
+    total = 0
+    stddev = []
+    for item in lst:
+        total += item
+    mean = total / len(lst)
+    total_for_var = 0
+    for item in lst:
+        total_for_var += (mean - item)**2
+    stddev.append((total_for_var/len(lst))**(1/2))
+    
+    lst = []
+    i = 0
+    while True:
+        if i == 126:
+            break
+        lst.append(start[len(start)-126] * (1 + lst_change[1]) ** i)
+        i += 1
+    
+    total = 0
+    for item in lst:
+        total += item
+    mean = total / len(lst)
+    total_for_var = 0
+    for item in lst:
+        total_for_var += (mean - item)**2
+    stddev.append((total_for_var/len(lst))**(1/2))
+    
+    lst = []
+    i = 0
+    while True:
+        if i == 126:
+            break
+        lst.append(start[len(start)-126] * (1 + lst_change[2]) ** i)
+        i += 1
+    
+    total = 0
+    for item in lst:
+        total += item
+    mean = total / len(lst)
+    total_for_var = 0
+    for item in lst:
+        total_for_var += (mean - item)**2
+    stddev.append((total_for_var/len(lst))**(1/2))
+    
+    lst = []
+    i = 0
+    while True:
+        if i == 126:
+            break
+        lst.append(start[len(start)-126] * (1 + lst_change[3]) ** i)
+        i += 1
+    
+    total = 0
+    for item in lst:
+        total += item
+    mean = total / len(lst)
+    total_for_var = 0
+    for item in lst:
+        total_for_var += (mean - item)**2
+    stddev.append((total_for_var/len(lst))**(1/2))
+    
+    lst = []
+    i = 0
+    while True:
+        if i == 126:
+            break
+        lst.append(start[len(start)-126] * (1 + lst_change[4]) ** i)
+        i += 1
+    
+    total = 0
+    for item in lst:
+        total += item
+    mean = total / len(lst)
+    total_for_var = 0
+    for item in lst:
+        total_for_var += (mean - item)**2
+    stddev.append((total_for_var/len(lst))**(1/2))
+    
+    lst = []
+    i = 0
+    while True:
+        if i == 126:
+            break
+        lst.append(start[len(start)-126] * (1 + lst_change[5]) ** i)
+        i += 1
+    
+    total = 0
+    for item in lst:
+        total += item
+    mean = total / len(lst)
+    total_for_var = 0
+    for item in lst:
+        total_for_var += (mean - item)**2
+    stddev.append((total_for_var/len(lst))**(1/2))
+    
+    lst = []
+    i = 0
+    while True:
+        if i == 126:
+            break
+        lst.append(start[len(start)-126] * (1 + lst_change[6]) ** i)
+        i += 1
+    
+    total = 0
+    for item in lst:
+        total += item
+    mean = total / len(lst)
+    total_for_var = 0
+    for item in lst:
+        total_for_var += (mean - item)**2
+    stddev.append((total_for_var/len(lst))**(1/2))
+    
+    return stddev
+
+def correlation(filename):
+    lst = moving_average_20_days(filename)
+    actual = lst[len(lst)-126:]
+    lst_change = sma_pct_changes_20_day(filename)
+    stddev_actual = stddev_benchmark(filename)
+    stddev_expected = stddev_stock(filename)
+    correlation = []
+    
+    w = 0
+    while True:
+        if w == 7:
+            break
+        expected = []
+        i = 0
+        while True:
+            if i == 126:
+                break
+            expected.append(lst[len(lst)-126] * (1 + lst_change[w]) ** i)
+            i += 1
+            
+        total = 0
+        for item in actual:
+            total += item
+        mean1 = total / len(actual)
+        
+        total = 0
+        for item in expected:
+            total += item
+        mean2 = total / len(actual)
+        
+        i = 0
+        total = 0
+        while True:
+            if i == 126:
+                break
+            total += ((actual[i]-mean1) * (expected[i]-mean2))
+            i += 1
+        correlation.append((total / len(actual)) / (stddev_actual[0] * stddev_expected[w]))
+        w += 1
+    
+    return correlation
+
+def average_error(filename):
+    ''' parameters: 
+    '''
+    lst = moving_average_20_days(filename)
+    actual = lst[len(lst)-126:]
+    lst_change = sma_pct_changes_20_day(filename)
+    error = []
+    
+    w = 0
+    while True:
+        if w == 7:
+            break
+        expected = []
+        i = 0
+        while True:
+            if i == 126:
+                break
+            expected.append(lst[len(lst)-126] * (1 + lst_change[w]) ** i)
+            i += 1
+        
+        i = 0
+        total = 0
+        while True:
+            if i == 126:
+                break
+            total += abs(1-(expected[i]/actual[i]))
+            i += 1
+        error.append((total / len(actual)))
+        w += 1
+    
+    return error
+
+def main():
+    stock_showcase("/Users/alexlook/Downloads/JPM.csv")
+    print(average_error("/Users/alexlook/Downloads/JPM.csv"))
+    
+    #
+    stocks = [average_error("/Users/alexlook/Downloads/AAPL (5).csv"),
+    average_error("/Users/alexlook/Downloads/AMGN.csv"),
+    average_error("/Users/alexlook/Downloads/AXP.csv"),
+    average_error("/Users/alexlook/Downloads/BA.csv"),
+    average_error("/Users/alexlook/Downloads/CAT.csv"),
+    average_error("/Users/alexlook/Downloads/CSCO.csv"),
+    average_error("/Users/alexlook/Downloads/CVX.csv"),
+    average_error("/Users/alexlook/Downloads/GS.csv"),
+    average_error("/Users/alexlook/Downloads/HD.csv"),
+    average_error("/Users/alexlook/Downloads/HON.csv"),
+    average_error("/Users/alexlook/Downloads/IBM.csv"),
+    average_error("/Users/alexlook/Downloads/INTC.csv"),
+    average_error("/Users/alexlook/Downloads/JNJ.csv"),
+    average_error("/Users/alexlook/Downloads/DIS.csv"),
+    average_error("/Users/alexlook/Downloads/JPM.csv"),
+    average_error("/Users/alexlook/Downloads/MCD.csv"),
+    average_error("/Users/alexlook/Downloads/MMM.csv"),
+    average_error("/Users/alexlook/Downloads/MRK.csv"),
+    average_error("/Users/alexlook/Downloads/MSFT.csv"),
+    average_error("/Users/alexlook/Downloads/NKE.csv"),
+    average_error("/Users/alexlook/Downloads/PG.csv"),
+    average_error("/Users/alexlook/Downloads/TRV.csv"),
+    average_error("/Users/alexlook/Downloads/PG.csv"),
+    average_error("/Users/alexlook/Downloads/UNH.csv"),
+    average_error("/Users/alexlook/Downloads/CRM.csv"),
+    average_error("/Users/alexlook/Downloads/VZ.csv"),
+    average_error("/Users/alexlook/Downloads/V.csv"),
+    average_error("/Users/alexlook/Downloads/WMT.csv")]
+    
+    overall_pct = []
+    t_2_year = 0
+    t_1_year = 0
+    t_6_months = 0
+    t_3_months = 0
+    t_1_months = 0
+    t_2_weeks = 0
+    t_1_weeks = 0
+    
+    for item in stocks:
+        t_2_year += item[0]
+        t_1_year += item[1]
+        t_6_months += item[2]
+        t_3_months += item[3]
+        t_1_months += item[4]
+        t_2_weeks += item[5]
+        t_1_weeks += item[6]
+        
+    overall_pct.append(t_2_year/28)
+    overall_pct.append(t_1_year/28)
+    overall_pct.append(t_6_months/28)
+    overall_pct.append(t_3_months/28)
+    overall_pct.append(t_1_months/28)
+    overall_pct.append(t_2_weeks/28)
+    overall_pct.append(t_1_weeks/28)
+    
+    print("Average percent error for 2 years is: ", round(overall_pct[0]*100,2), "%")
+    print("Average percent error for 1 year is: ", round(overall_pct[1]*100,2), "%")
+    print("Average percent error for 6 months is: ", round(overall_pct[2]*100,2), "%")
+    print("Average percent error for 3 months is: ", round(overall_pct[3]*100,2), "%")
+    print("Average percent error for 1 month is: ", round(overall_pct[4]*100,2), "%")
+    print("Average percent error for 2 weeks is: ", round(overall_pct[5]*100,2), "%")
+    print("Average percent error for 1 week is: ", round(overall_pct[6]*100,2), "%\n")
+    
+    print("Therefore, we deem the most accurate range of data is 1 year!")
+    
+    i = 0
+    w = 0
+    plt.figure()
+    plt.xlabel("Stocks")
+    plt.ylabel("Percent Error")
+    plt.title("Percent Error on Stocks Using Data From 2 Years")
+    for item in stocks:
+        plt.plot(w, stocks[w][i], ".", color = "red")
+        w += 1
+        
+    i = 1
+    w = 0
+    plt.figure()
+    plt.xlabel("Stocks")
+    plt.ylabel("Percent Error")
+    plt.title("Percent Error on Stocks Using Data From 1 Year")
+    for item in stocks:
+        plt.plot(w, stocks[w][i], ".", color = "red")
+        w += 1
+        
+    i = 2
+    w = 0
+    plt.figure()
+    plt.xlabel("Stocks")
+    plt.ylabel("Percent Error")
+    plt.title("Percent Error on Stocks Using Data From 6 Months")
+    for item in stocks:
+        plt.plot(w, stocks[w][i], ".", color = "red")
+        w += 1
+        
+    i = 3
+    w = 0
+    plt.figure()
+    plt.xlabel("Stocks")
+    plt.ylabel("Percent Error")
+    plt.title("Percent Error on Stocks Using Data From 3 Months")
+    for item in stocks:
+        plt.plot(w, stocks[w][i], ".", color = "red")
+        w += 1
+        
+    i = 4
+    w = 0
+    plt.figure()
+    plt.xlabel("Stocks")
+    plt.ylabel("Percent Error")
+    plt.title("Percent Error on Stocks Using Data From 1 Month")
+    for item in stocks:
+        plt.plot(w, stocks[w][i], ".", color = "red")
+        w += 1
+        
+    i = 5
+    w = 0
+    plt.figure()
+    plt.xlabel("Stocks")
+    plt.ylabel("Percent Error")
+    plt.title("Percent Error on Stocks Using Data From 2 Weeks")
+    for item in stocks:
+        plt.plot(w, stocks[w][i], ".", color = "red")
+        w += 1
+        
+    i = 6
+    w = 0
+    plt.figure()
+    plt.xlabel("Stocks")
+    plt.ylabel("Percent Error")
+    plt.title("Percent Error on Stocks Using Data From 1 Week")
+    for item in stocks:
+        plt.plot(w, stocks[w][i], ".", color = "red")
+        w += 1
+    
+    plt.figure()
+    w = 0
+
+    for item in stocks:
+        plt.plot(w, item[0], "o", markersize = 3, color = "blue")
+        plt.plot(w, item[1], "o", markersize = 3, color = "red")
+        plt.plot(w, item[2], "o", markersize = 3, color = "green")
+        plt.plot(w, item[3], "o", markersize = 3, color = "orange")
+        plt.plot(w, item[4], "o", markersize = 3, color = "pink")
+        plt.plot(w, item[5], "o", markersize = 3, color = "yellow")
+        plt.plot(w, item[6], "o", markersize = 3, color = "orange")
+        w +=  1
+    
+    plt.plot(0, stocks[0][0], "o", markersize = 3, color = "blue", label = "2 years")
+    plt.plot(0, stocks[0][1], "o", markersize = 3, color = "red", label = "1 year")
+    plt.plot(0, stocks[0][2], "o", markersize = 3, color = "green", label = "6 motnhs")
+    plt.plot(0, stocks[0][3], "o", markersize = 3, color = "orange", label = "3 months")
+    plt.plot(0, stocks[0][4], "o", markersize = 3, color = "pink", label = "1 month")
+    plt.plot(0, stocks[0][5], "o", markersize = 3, color = "yellow", label = "2 weeks")
+    plt.plot(0, stocks[0][6], "o", markersize = 3, color = "orange", label = "1 week")
+    plt.xlabel("Stocks")
+    plt.ylabel("Percent Error")
+    plt.title("Cumulative Stock vs Perecent Error Graph")
+    plt.legend()
+
+main()
+
+'''
+Problem Statement:
+	Question: What is the most effective time interval for accurately predicting a stock’s momentum?
+	Rationale: Momentum is an important aspect of trading, and there are no 
+    standard interval benchmarks for estimating it. Additionally, momentum 
+    requires calculations on the daily fluctuations of a stock, making doing 
+    it without computer assistance incredibly difficult. Because of these reasons, 
+    creating a benchmark through the use of Python would make the process simpler, 
+    help to standardize, and make momentum-based trading more accurate.
+
+Data:
+	An index of 27 stocks was chosen from the Dow Jones, as these stocks are 
+    relatively stable and have a high trading volume. Prices were taken from 
+    July 1, 2015 to December 31, 2017 through Yahoo Finance in order to avoid 
+    the atypical market that occurred due to the COVID-19 pandemic, with 6 
+    months used to compare the stocks, and 2 years of data to predict. Only 
+    opening and closing prices were used in our calculations, as they were 
+    the only data points needed to calculate simple moving averages. For the 
+    27 stocks in our index, we used the opening and closing points for each
+    day, over the 2.5 year time period, resulting in 34,560 data points across
+    our entire project. These are simplified down to moving averages of each
+    day, then resulting in 17,280 data points.
+
+Analysis:
+	The primary computational techniques used in this project are lists, 
+    matplotlib, a nd for/while loops. Lists are used to hold large amounts of data for each stock/interval, allowing us to work with them individually or as a group. Matplotlib was used to visualize data in each step of the process, helping us determine what was working during the process, and to provide visual aid to viewers of what our final results mean. Finally, for and while loops are used to iterate over large amounts of data to perform computations on them, for example calculating the moving averages from the opening and closing stock prices over 6 months.
+
+	Our results indicated that 1 year was the most effective interval to predict stock momentum with. This was found by calculating percent error for each of the trendlines, found in the Predicted Vs. Actual Returns graph. After analysis on the 27 stocks, the final percent errors came to: 1 week: 10.68%, 2 weeks: 9.97%, 1 month: 8.17%, 3 months: 6.21%, 6 months: 5.26%, 1 year: 4.17% and 2 years: 4.79%.
+
+Interpretation:
+	We expected that the lower intervals would create less accurate predictions due to the short time frame, but we were surprised to learn that 1 year was more accurate for predictions than two years. Additionally, it is interesting given the context of momentum-based trading, as it is conducted over a short period of time, as one would expect that shorter time frames would more accurately predict current trends. It appears that 1 year provides enough weight to current and past data to predict trends over longer and shorter periods of time, where the other alternatives may fall short.
+
+	There were many limitations that made completing this project difficult. Stocks are volatile, and many factors outside of their previous performance contribute to their prices, such as economic, social, and political events. For example, our model would likely misrepresent stock trends during the COVID-19 pandemic, as it cannot account for events that occur outside of the market. Additionally, our use of simple moving averages is effective, but likely less accurate than an exponential moving average, which would apply more weight to current stock prices. 
+
+Simple vs. exponential moving averages would be an interesting avenue to explore in further research, to determine which form of moving averages would be more effective at predicting current vs. long term trends. Further, determining the effectiveness of our model in atypical markets (such as the COVID-19 pandemic) would also be worth exploring.
+'''
