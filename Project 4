@@ -9,11 +9,11 @@ Created on Wed Nov 10 11:50:21 2021
 import csv
 import matplotlib.pyplot as plt
 
-# This first funciton is purely made to read the files that we have downloaded,
-# converting the files from an excel file into something else that we can use
 def file_processing(filename):
-    ''' parameters: a csv file
-        returns: a list
+    ''' does: This first funciton is purely made to read the files that we have downloaded,
+              converting the files from an excel file into something else that we can use
+    	parameters: a csv file
+       	returns: a list
     '''
     infile = open(filename, "r")
     csv_reader = csv.reader(infile, delimiter = ",")
@@ -28,7 +28,8 @@ def file_processing(filename):
 # have haved should have the same days of trading etc. this function can be 
 # used universally for all the files that we have downloaded
 def storing_closing(filename):
-    ''' parameters: file_processing (a list)
+    ''' does: function strips unecessary data from the CSV files being used
+    	parameters: file_processing (a file)
         returns: adj_lst (a list)
     '''
     
@@ -42,7 +43,8 @@ def storing_closing(filename):
     return adj_list
 
 def moving_average_5_days(filename):
-    ''' parameters: storing_closing (a list)
+    ''' does: calculates the moving average over 5 days using file
+    	parameters: storing_closing (a list)
         returns: moving_avg (a list)
     '''
     
@@ -75,7 +77,8 @@ def moving_average_5_days(filename):
     return moving_avg
     
 def moving_average_20_days(filename):
-    ''' parameters: storing_closing (a list)
+    ''' does: calculates the moving average over 20 days using the file
+    	parameters: storing_closing (a list)
         returns: moving_avg (a list)
     '''
     
@@ -108,7 +111,8 @@ def moving_average_20_days(filename):
     return moving_avg
 
 def moving_average_100_days(filename):
-    ''' parameters: storing_closing (a list)
+    ''' does: calculates the moving average over 100 days using the file
+    	parameters: storing_closing (a list)
         returns: moving_avg (a list)
     '''
     
@@ -141,7 +145,9 @@ def moving_average_100_days(filename):
     return moving_avg
 
 def momentum_line(filename):
-    ''' parameters: storing_closing (a list)
+    ''' does: creates a list of points from the 20 day momentum measurement for 
+    		creating the momentum line
+    	parameters: storing_closing (a list)
         returns: momentum_lst (a list)
     '''
     
@@ -161,7 +167,8 @@ def momentum_line(filename):
     return momentum_lst
 
 def sma_pct_changes_20_day(filename):
-    ''' parameters: moving_average_20_days (a list)
+    ''' does: creates the predictions for each interval
+    	parameters: moving_average_20_days (a list)
         returns: final_lst (a list)
     '''
     lst = moving_average_20_days(filename)
@@ -268,7 +275,8 @@ def sma_pct_changes_20_day(filename):
     return final_lst
 
 def momentum_graph(filename):
-    ''' parameters: momentum_line (a list)
+    ''' does: plots the 20 day momentum list on a graph
+    	parameters: filename (a file)
         returns: 20 Day Momentum Graph (a figure)
     '''
     
@@ -296,8 +304,8 @@ def momentum_graph(filename):
     return plt.figure()
 
 def moving_averages_graph(filename):
-    ''' parameters: moving_average_5_days (a list), moving_average_20_days (a list),
-    	moving_average_100_days (a list),
+    ''' does: plots each moving average line on the same graph for visual aid
+    	parameters: filename (a file)
         returns: Different Moving Averages Measurements (a figure)
     '''
     
@@ -336,7 +344,8 @@ def moving_averages_graph(filename):
     return plt.figure()
 
 def stock_price_graph(filename):
-    ''' parameters: storing_closing (a list)
+    ''' does: plots percent change in JP Morgan stock by day for visual aid
+    	parameters: filename (a file)
         returns: % Price Change for JP Morgan Stock by Day (a figure)
     '''
     
@@ -371,8 +380,10 @@ def stock_price_graph(filename):
     return plt.figure()
 
 def moving_average_comparison(filename):
-    ''' parameters: moving_average_20_days (a list), sma_pct_changes_20_day (a list)
-        returns: Projected vs Actual Returns (a list)
+    ''' does: plots moving averages (prediction) against actual returns
+    		to determine accuracy, also visual aid
+    	parameters: filename (a file)
+        returns: Projected vs Actual Returns (a figure)
     '''
     
     lst = moving_average_20_days(filename)
@@ -421,8 +432,11 @@ def moving_average_comparison(filename):
     return plt.figure()
 
 def moving_average_comparison_zoomed(filename):
-    ''' parameters: moving_average_20_days (a list), sma_pct_changes_20_day (a list)
-    	Projected vs Actual Returns Zoomed (a figure)
+    ''' does: plots moving averages (prediction) against actual returns
+    		to determine accuracy, also visual aid (now zoomed in on the closest
+		values)
+    	parameters: filename (a file)
+        returns: Projected vs Actual Returns Zoomed (a figure)
     '''
     lst = moving_average_20_days(filename)
     i = len(lst)-126
@@ -466,9 +480,16 @@ def moving_average_comparison_zoomed(filename):
     # plt.plot(y, lst[len(lst)-126] * (1 + lst1[6]) ** i, "*", markersize = 5, color = "yellow", label = "1 week")
     plt.legend()
     return plt.figure()
-
-# This funciton to 
+ 
 def stock_showcase(filename):
+    ''' does: reports all previous figures as a showcase of each part of the process
+    	parameters: filename (a file)
+        returns: 20 Day Momentum Graph (a figure)
+	Different Moving Averages Measurements (a figure)
+	% Price Change for JP Morgan Stock by Day (a figure)
+	Projected vs Actual Returns (a figure)
+	Projected vs Actual Returns Zoomed (a figure)	
+    '''
     stock_price_graph(filename)
     moving_averages_graph(filename)
     momentum_graph(filename)
@@ -476,9 +497,11 @@ def stock_showcase(filename):
     moving_average_comparison_zoomed(filename)
     
     return plt.figure
-
+  
 def average_error(filename):
-    ''' parameters: 
+    ''' does: calculates average error for each trendline
+    	parameters: filename (a file)
+        returns: error (a list)
     '''
     lst = moving_average_20_days(filename)
     actual = lst[len(lst)-126:]
@@ -512,15 +535,10 @@ def average_error(filename):
     return error
 
 def main():
+	
     stock_showcase("/Users/alexlook/Downloads/JPM.csv")
     print(average_error("/Users/alexlook/Downloads/JPM.csv"))
     
-    # here we are filling in every stock that we have used, it should
-    # be flexible to any stock within the correct time range
-    # we realize that using the absolute path might mess up when you guys
-    # run the file, but it would not run for us otherwise. If you do wish to
-    # run the file, these filenames should be replaced with their respective
-    # absolute path
     stocks = [average_error("/Users/alexlook/Downloads/AAPL (5).csv"),
     average_error("/Users/alexlook/Downloads/AMGN.csv"),
     average_error("/Users/alexlook/Downloads/AXP.csv"),
