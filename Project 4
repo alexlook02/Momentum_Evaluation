@@ -57,10 +57,15 @@ def moving_average_5_days(filename):
                 break
         if i < 4:
             total += float(lst[i])
+	# since we can only start to create 5 day moving averages when we reach
+	# 5 days, we make it so that only when we hit i == 5 do we start
+	# to append on the values to the list
         if i == 5:
             total += float(lst[i])
             avg = total/5
             moving_avg.append(avg)
+	# here we simple add in the next value while subtracting the 
+	# first value so that it constantly changes to the appropriate number
         if i > 5:
             total -= float(lst[i-5])
             total += float(lst[i])
@@ -86,10 +91,15 @@ def moving_average_20_days(filename):
                 break
         if i < 19:
             total += float(lst[i])
+	# since we can only start to create 20 day moving averages when we reach
+	# 20 days, we make it so that only when we hit i == 19 do we start
+	# to append on the values to the list
         if i == 19:
             total += float(lst[i])
             avg = total/20
             moving_avg.append(avg)
+	# here we simple add in the next value while subtracting the 
+	# first value so that it constantly changes to the appropriate number
         if i > 19:
             total -= float(lst[i-20])
             total += float(lst[i])
@@ -115,10 +125,15 @@ def moving_average_100_days(filename):
                 break
         if i < 98:
             total += float(lst[i])
+	# since we can only start to create 100 day moving averages when we reach
+	# 100 days, we make it so that only when we hit i == 99 do we start
+	# to append on the values to the list
         if i == 99:
             total += float(lst[i])
             avg = total/100
             moving_avg.append(avg)
+	# here we simple add in the next value while subtracting the 
+	# first value so that it constantly changes to the appropriate number
         if i > 99:
             total -= float(lst[i-100])
             total += float(lst[i])
@@ -144,6 +159,8 @@ def momentum_line(filename):
         if i >= 20:
             if i == len(lst):
                 break
+	    # momentum is simply calculated as present value - past 
+	    # value at a certain time
             momentum = float(lst[i]) - float(lst[i - 20])
             momentum_lst.append(momentum)
         i += 1
@@ -156,6 +173,9 @@ def sma_pct_changes_20_day(filename):
     '''
     lst = moving_average_20_days(filename)
     final_lst = []
+    # for each of these lists, these are the appropriate ranges that we
+    # take the data from. We use -126 because 126 days represents half a 
+    # year of trading which is used for our comparison but not predictions.
     lst_2_year = lst[:(len(lst)-126)]
     lst_1_year = lst[int(round((len(lst)-126)/2,0)):(len(lst)-126)]
     lst_6_months = lst[int(round((len(lst)-126)/4*3,0)):(len(lst)-126)]
@@ -164,6 +184,10 @@ def sma_pct_changes_20_day(filename):
     lst_2_week = lst[int(round((len(lst)-126)*47/48,0)):(len(lst)-126)]
     lst_1_week = lst[int(round((len(lst)-126)*95/96,0)):(len(lst)-126)]
     
+    # once we have stored the correct data for each interval, we can simply
+    # add the day by day percent change, then divide by the total in the list
+    # to find out the average percent change per day and append it to one larger list
+    # the following statements are all identical except for what data interval they use
     total = 0
     i = 0
     while True:
@@ -263,6 +287,8 @@ def momentum_graph(filename):
     lst = momentum_line(filename)
     i = 0
     y = 10
+    # we use a while loop in order to plot all the data and create
+    # the graph without having to plot each point by hand
     while True:
         if i == len(lst):
             break
@@ -286,12 +312,15 @@ def moving_averages_graph(filename):
     lst = moving_average_5_days(filename)
     plt.figure()
     
+    # initially we plot the 5 day moving average on the graph and we plot one point twice
+    # so that we can use it to label the other points
     y = 0
     for item in lst:
         plt.plot(y, item, ".", markersize = 1, color = "blue")
         y += 1
     plt.plot(y, lst[0], ".", markersize = 1, color = "blue", label = "5 Day Moving Average")
-        
+    
+    # then we plot the 20 day moving average on the graph
     lst = moving_average_20_days(filename)
     y = 20
     for item in lst:
@@ -299,6 +328,7 @@ def moving_averages_graph(filename):
         y += 1
     plt.plot(20, lst[0], ".", markersize = 1, color = "green", label = "20 Day Moving Average")
 
+    # finally we plot the 100 day moving average on the graph
     lst = moving_average_100_days(filename)
     plt.ylabel("Price")
     plt.xlabel("Trading Days")
@@ -332,7 +362,11 @@ def stock_price_graph(filename):
         if i == len(lst):
             break
         pct = 0
+	# here we are adding in the pct change for each day and using that pct
+	# as the our y value when we plot each point
         pct += (float(lst[i]) - float(lst[0])) / float(lst[0]) * 100
+	# we also color code each point to make them red or green based on whether 
+	# the stock increased in price or decreased
         if float(lst[i]) > float(lst[i-1]):
             
             plt.plot(y, pct, ".", markersize = 1, color = "green")
@@ -359,6 +393,7 @@ def moving_average_comparison(filename):
     plt.xlabel("Trading Days")
     plt.ylabel("Simple Moving Average (20 Days)")
     plt.title("Projected vs Actual Returns")
+    # this plots the actual returns on the stock for comparison
     while True:
         if i == len(lst):
             break
@@ -369,6 +404,9 @@ def moving_average_comparison(filename):
     lst1 = sma_pct_changes_20_day(filename)
     i = 0
     y = 0
+    # here we are using the same starting point for each one, then we are multiplying that value
+    # by the predicted values for each time interval that we determined before. We use exponents
+    # to recognize that the value is compounding on each other. We also color code by each interval.
     while True:
         if i == 126:
             break
@@ -381,7 +419,8 @@ def moving_average_comparison(filename):
         plt.plot(y, lst[len(lst)-126] * (1 + lst1[6]) ** i, ".", markersize = 1, color = "yellow")
         i += 1
         y += 1
-        
+    
+    # here we plot each beginning point so that we can use them as labels
     plt.plot(y, lst[len(lst)-126] * (1 + lst1[0]) ** i, "*", markersize = 5, color = "blue", label = "2 years")
     plt.plot(y, lst[len(lst)-126] * (1 + lst1[1]) ** i, "*", markersize = 5, color = "red", label = "1 year")
     plt.plot(y, lst[len(lst)-126] * (1 + lst1[2]) ** i, "*", markersize = 5, color = "green", label = "6 months")
@@ -406,6 +445,7 @@ def moving_average_comparison_zoomed(filename):
     plt.xlabel("Trading Days")
     plt.ylabel("Simple Moving Average (20 Days)")
     plt.title("Projected vs Actual Returns Zoomed")
+    # this plot the actual returns on the stock for comparison
     while True:
         if i == len(lst):
             break
@@ -419,6 +459,8 @@ def moving_average_comparison_zoomed(filename):
     while True:
         if i == 126:
             break
+	# this allows us to focus on any interval that we want to by simply commenting out what
+	# we don't need to see. In this way it allows it to be used by any stock.
         plt.plot(y, lst[len(lst)-126] * (1 + lst1[0])**i, ".", markersize = 1, color = "blue")
         plt.plot(y, lst[len(lst)-126] * (1 + lst1[1]) ** i, ".", markersize = 1, color = "red")
         # plt.plot(y, lst[len(lst)-126] * (1 + lst1[2]) ** i, ".", markersize = 1, color = "green")
@@ -455,196 +497,7 @@ def stock_showcase(filename):
     moving_average_comparison_zoomed(filename)
     
     return plt.figure
-
-
-#orignially attempted to use correlation to determine accuracy,
-#left in for transparancy in the process
-'''
-# This calculates the variance of our actual returns which will later be used 
-# to find the correlation between our expected and actual data
-def stddev_benchmark(filename):
-
-    lst = moving_average_20_days(filename)
-    lst = lst[(len(lst)-126):]
-    total = 0
-    stddev = []
-    for item in lst:
-        total += item
-    mean = total / len(lst)
-    total_for_var = 0
-    for item in lst:
-        total_for_var += (mean - item)**2
-    stddev.append((total_for_var/len(lst))**(1/2))
-    return stddev
-    
-def stddev_stock(filename):
-    start = moving_average_20_days(filename)
-    lst_change = sma_pct_changes_20_day(filename)
-    lst = []
-    i = 0
-    while True:
-        if i == 126:
-            break
-        lst.append(start[len(start)-126] * (1 + lst_change[0]) ** i)
-        i += 1
-    
-    total = 0
-    stddev = []
-    for item in lst:
-        total += item
-    mean = total / len(lst)
-    total_for_var = 0
-    for item in lst:
-        total_for_var += (mean - item)**2
-    stddev.append((total_for_var/len(lst))**(1/2))
-    
-    lst = []
-    i = 0
-    while True:
-        if i == 126:
-            break
-        lst.append(start[len(start)-126] * (1 + lst_change[1]) ** i)
-        i += 1
-    
-    total = 0
-    for item in lst:
-        total += item
-    mean = total / len(lst)
-    total_for_var = 0
-    for item in lst:
-        total_for_var += (mean - item)**2
-    stddev.append((total_for_var/len(lst))**(1/2))
-    
-    lst = []
-    i = 0
-    while True:
-        if i == 126:
-            break
-        lst.append(start[len(start)-126] * (1 + lst_change[2]) ** i)
-        i += 1
-    
-    total = 0
-    for item in lst:
-        total += item
-    mean = total / len(lst)
-    total_for_var = 0
-    for item in lst:
-        total_for_var += (mean - item)**2
-    stddev.append((total_for_var/len(lst))**(1/2))
-    
-    lst = []
-    i = 0
-    while True:
-        if i == 126:
-            break
-        lst.append(start[len(start)-126] * (1 + lst_change[3]) ** i)
-        i += 1
-    
-    total = 0
-    for item in lst:
-        total += item
-    mean = total / len(lst)
-    total_for_var = 0
-    for item in lst:
-        total_for_var += (mean - item)**2
-    stddev.append((total_for_var/len(lst))**(1/2))
-    
-    lst = []
-    i = 0
-    while True:
-        if i == 126:
-            break
-        lst.append(start[len(start)-126] * (1 + lst_change[4]) ** i)
-        i += 1
-    
-    total = 0
-    for item in lst:
-        total += item
-    mean = total / len(lst)
-    total_for_var = 0
-    for item in lst:
-        total_for_var += (mean - item)**2
-    stddev.append((total_for_var/len(lst))**(1/2))
-    
-    lst = []
-    i = 0
-    while True:
-        if i == 126:
-            break
-        lst.append(start[len(start)-126] * (1 + lst_change[5]) ** i)
-        i += 1
-    
-    total = 0
-    for item in lst:
-        total += item
-    mean = total / len(lst)
-    total_for_var = 0
-    for item in lst:
-        total_for_var += (mean - item)**2
-    stddev.append((total_for_var/len(lst))**(1/2))
-    
-    lst = []
-    i = 0
-    while True:
-        if i == 126:
-            break
-        lst.append(start[len(start)-126] * (1 + lst_change[6]) ** i)
-        i += 1
-    
-    total = 0
-    for item in lst:
-        total += item
-    mean = total / len(lst)
-    total_for_var = 0
-    for item in lst:
-        total_for_var += (mean - item)**2
-    stddev.append((total_for_var/len(lst))**(1/2))
-    
-    return stddev
-
-def correlation(filename):
-    lst = moving_average_20_days(filename)
-    actual = lst[len(lst)-126:]
-    lst_change = sma_pct_changes_20_day(filename)
-    stddev_actual = stddev_benchmark(filename)
-    stddev_expected = stddev_stock(filename)
-    correlation = []
-    
-    w = 0
-    while True:
-        if w == 7:
-            break
-        expected = []
-        i = 0
-        while True:
-            if i == 126:
-                break
-            expected.append(lst[len(lst)-126] * (1 + lst_change[w]) ** i)
-            i += 1
-            
-        total = 0
-        for item in actual:
-            total += item
-        mean1 = total / len(actual)
-        
-        total = 0
-        for item in expected:
-            total += item
-        mean2 = total / len(actual)
-        
-        i = 0
-        total = 0
-        while True:
-            if i == 126:
-                break
-            total += ((actual[i]-mean1) * (expected[i]-mean2))
-            i += 1
-        correlation.append((total / len(actual)) / (stddev_actual[0] * stddev_expected[w]))
-        w += 1
-    
-    return correlation
-'''
-
+  
 def average_error(filename):
     ''' does: calculates average error for each trendline
     	parameters: filename (a file)
@@ -667,6 +520,8 @@ def average_error(filename):
             expected.append(lst[len(lst)-126] * (1 + lst_change[w]) ** i)
             i += 1
         
+	# here we are simply going through each point and comparing the expected to
+	# the actual returns to find out the error for each interval
         i = 0
         total = 0
         while True:
@@ -722,6 +577,7 @@ def main():
     t_2_weeks = 0
     t_1_weeks = 0
     
+    # here we are totalling to overall error for each interval
     for item in stocks:
         t_2_year += item[0]
         t_1_year += item[1]
@@ -730,7 +586,9 @@ def main():
         t_1_months += item[4]
         t_2_weeks += item[5]
         t_1_weeks += item[6]
-        
+    
+    # then we divide the overall error by the number of stocks 
+    # in order to get average error
     overall_pct.append(t_2_year/28)
     overall_pct.append(t_1_year/28)
     overall_pct.append(t_6_months/28)
@@ -739,6 +597,7 @@ def main():
     overall_pct.append(t_2_weeks/28)
     overall_pct.append(t_1_weeks/28)
     
+    # here we are simply printing the results 
     print("Average percent error for 2 years is: ", round(overall_pct[0]*100,2), "%")
     print("Average percent error for 1 year is: ", round(overall_pct[1]*100,2), "%")
     print("Average percent error for 6 months is: ", round(overall_pct[2]*100,2), "%")
@@ -749,6 +608,8 @@ def main():
     
     print("Therefore, we deem the most accurate range of data is 1 year!")
     
+    # these plots are all the same except using diffent intervals. They 
+    # show the error on each stock for that respective time interval
     i = 0
     w = 0
     plt.figure()
@@ -821,7 +682,8 @@ def main():
     
     plt.figure()
     w = 0
-
+    # this plots all of the errors for each interval and each plot and color
+    # codes this for better understanding
     for item in stocks:
         plt.plot(w, item[0], "o", markersize = 3, color = "blue")
         plt.plot(w, item[1], "o", markersize = 3, color = "red")
