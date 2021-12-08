@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Wed Nov 10 11:50:21 2021
-@author: alexlook
+DS2001 Project
+Authors: Benjamin Steel and Alex Look
+DS2001
+12/07/21
 """
+#in order to run this code, you'll need to download each file and add their absolute paths
+#to line 552 --> onward as relative paths weren't working
 
 # Here we are importing in the necessary modules that we will be using throughout the project
 import csv
@@ -539,6 +543,12 @@ def main():
     stock_showcase("/Users/alexlook/Downloads/JPM.csv")
     print(average_error("/Users/alexlook/Downloads/JPM.csv"))
     
+    # here we are filling in every stock that we have used, it should
+    # be flexible to any stock within the correct time range
+    # we realize that using the absolute path might mess up when you guys
+    # run the file, but it would not run for us otherwise. If you do wish to
+    # run the file, these filenames should be replaced with their respective
+    # absolute path
     stocks = [average_error("/Users/alexlook/Downloads/AAPL (5).csv"),
     average_error("/Users/alexlook/Downloads/AMGN.csv"),
     average_error("/Users/alexlook/Downloads/AXP.csv"),
