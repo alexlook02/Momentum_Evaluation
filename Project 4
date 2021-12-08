@@ -818,11 +818,11 @@ main()
 Problem Statement:
 	Question: What is the most effective time interval for accurately predicting a stock’s momentum?
 	Rationale: Momentum is an important aspect of trading, and there are no 
-    standard interval benchmarks for estimating it. Additionally, momentum 
-    requires calculations on the daily fluctuations of a stock, making doing 
-    it without computer assistance incredibly difficult. Because of these reasons, 
-    creating a benchmark through the use of Python would make the process simpler, 
-    help to standardize, and make momentum-based trading more accurate.
+    	                standard interval benchmarks for estimating it. Additionally, momentum 
+    			requires calculations on the daily fluctuations of a stock, making doing 
+    			it without computer assistance incredibly difficult. Because of these reasons, 
+    			creating a benchmark through the use of Python would make the process simpler, 
+    			help to standardize, and make momentum-based trading more accurate.
 
 Data:
 	An index of 27 stocks was chosen from the Dow Jones, as these stocks are 
@@ -839,14 +839,42 @@ Data:
 
 Analysis:
 	The primary computational techniques used in this project are lists, 
-    matplotlib, a nd for/while loops. Lists are used to hold large amounts of data for each stock/interval, allowing us to work with them individually or as a group. Matplotlib was used to visualize data in each step of the process, helping us determine what was working during the process, and to provide visual aid to viewers of what our final results mean. Finally, for and while loops are used to iterate over large amounts of data to perform computations on them, for example calculating the moving averages from the opening and closing stock prices over 6 months.
+    matplotlib, and for/while loops. Lists are used to hold large amounts of 
+    data for each stock/interval, allowing us to work with them individually 
+    or as a group. Matplotlib was used to visualize data in each step of the 
+    process, helping us determine what was working during the process, and to 
+    provide visual aid to viewers of what our final results mean. Finally, for 
+    and while loops are used to iterate over large amounts of data to perform 
+    computations on them, for example calculating the moving averages from the 
+    opening and closing stock prices over 6 months.
 
-	Our results indicated that 1 year was the most effective interval to predict stock momentum with. This was found by calculating percent error for each of the trendlines, found in the Predicted Vs. Actual Returns graph. After analysis on the 27 stocks, the final percent errors came to: 1 week: 10.68%, 2 weeks: 9.97%, 1 month: 8.17%, 3 months: 6.21%, 6 months: 5.26%, 1 year: 4.17% and 2 years: 4.79%.
+	Our results indicated that 1 year was the most effective interval to 
+    predict stock momentum with. This was found by calculating percent error 
+    for each of the trendlines, found in the Predicted Vs. Actual Returns graph. 
+    After analysis on the 27 stocks, the final percent errors came to: 1 week: 10.68%, 
+    2 weeks: 9.97%, 1 month: 8.17%, 3 months: 6.21%, 6 months: 5.26%, 1 year: 4.17% and 
+    2 years: 4.79%.
 
 Interpretation:
-	We expected that the lower intervals would create less accurate predictions due to the short time frame, but we were surprised to learn that 1 year was more accurate for predictions than two years. Additionally, it is interesting given the context of momentum-based trading, as it is conducted over a short period of time, as one would expect that shorter time frames would more accurately predict current trends. It appears that 1 year provides enough weight to current and past data to predict trends over longer and shorter periods of time, where the other alternatives may fall short.
+	We expected that the lower intervals would create less accurate predictions 
+    due to the short time frame, but we were surprised to learn that 1 year was 
+    more accurate for predictions than two years. Additionally, it is interesting 
+    given the context of momentum-based trading, as it is conducted over a short period 
+    of time, as one would expect that shorter time frames would more accurately predict 
+    current trends. It appears that 1 year provides enough weight to current and past data 
+    to predict trends over longer and shorter periods of time, where the other alternatives 
+    may fall short.
 
-	There were many limitations that made completing this project difficult. Stocks are volatile, and many factors outside of their previous performance contribute to their prices, such as economic, social, and political events. For example, our model would likely misrepresent stock trends during the COVID-19 pandemic, as it cannot account for events that occur outside of the market. Additionally, our use of simple moving averages is effective, but likely less accurate than an exponential moving average, which would apply more weight to current stock prices. 
+	There were many limitations that made completing this project difficult. Stocks 
+    are volatile, and many factors outside of their previous performance contribute to 
+    their prices, such as economic, social, and political events. For example, our model 
+    would likely misrepresent stock trends during the COVID-19 pandemic, as it cannot account 
+    for events that occur outside of the market. Additionally, our use of simple moving averages 
+    is effective, but likely less accurate than an exponential moving average, which would apply 
+    more weight to current stock prices. 
 
-Simple vs. exponential moving averages would be an interesting avenue to explore in further research, to determine which form of moving averages would be more effective at predicting current vs. long term trends. Further, determining the effectiveness of our model in atypical markets (such as the COVID-19 pandemic) would also be worth exploring.
+	Simple vs. exponential moving averages would be an interesting avenue to explore in 
+    further research, to determine which form of moving averages would be more effective at 
+    predicting current vs. long term trends. Further, determining the effectiveness of our model 
+    in atypical markets (such as the COVID-19 pandemic) would also be worth exploring.
 '''
