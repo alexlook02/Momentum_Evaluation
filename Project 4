@@ -42,8 +42,8 @@ def storing_closing(filename):
     return adj_list
 
 def moving_average_5_days(filename):
-    ''' parameters: a csv file
-        returns: a list
+    ''' parameters: storing_closing (a list)
+        returns: moving_avg (a list)
     '''
     
     lst = storing_closing(filename)
@@ -70,8 +70,8 @@ def moving_average_5_days(filename):
     return moving_avg
     
 def moving_average_20_days(filename):
-    ''' parameters: a csv file
-        returns: a list
+    ''' parameters: storing_closing (a list)
+        returns: moving_avg (a list)
     '''
     
     lst = storing_closing(filename)
@@ -98,8 +98,8 @@ def moving_average_20_days(filename):
     return moving_avg
 
 def moving_average_100_days(filename):
-    ''' parameters: a csv file
-        returns: a list
+    ''' parameters: storing_closing (a list)
+        returns: moving_avg (a list)
     '''
     
     lst = storing_closing(filename)
@@ -126,8 +126,8 @@ def moving_average_100_days(filename):
     return moving_avg
 
 def momentum_line(filename):
-    ''' parameters: a list
-        returns: a list
+    ''' parameters: storing_closing (a list)
+        returns: momentum_lst (a list)
     '''
     
     lst = storing_closing(filename)
@@ -144,8 +144,8 @@ def momentum_line(filename):
     return momentum_lst
 
 def sma_pct_changes_20_day(filename):
-    ''' parameters: a list
-        returns: a list
+    ''' parameters: moving_average_20_days (a list)
+        returns: final_lst (a list)
     '''
     lst = moving_average_20_days(filename)
     final_lst = []
@@ -244,8 +244,8 @@ def sma_pct_changes_20_day(filename):
     return final_lst
 
 def momentum_graph(filename):
-    ''' parameters: a list
-        returns: a figure
+    ''' parameters: momentum_line (a list)
+        returns: 20 Day Momentum Graph (a figure)
     '''
     
     plt.figure()
@@ -270,8 +270,9 @@ def momentum_graph(filename):
     return plt.figure()
 
 def moving_averages_graph(filename):
-    ''' parameters: a list
-        returns: a figure
+    ''' parameters: moving_average_5_days (a list), moving_average_20_days (a list),
+    	moving_average_100_days (a list),
+        returns: Different Moving Averages Measurements (a figure)
     '''
     
     lst = moving_average_5_days(filename)
@@ -305,7 +306,7 @@ def moving_averages_graph(filename):
     return plt.figure()
 
 def stock_price_graph(filename):
-    ''' parameters: a list
+    ''' parameters: storing_closing (
         returns: a figure
     '''
     
