@@ -846,7 +846,9 @@ Analysis:
     provide visual aid to viewers of what our final results mean. Finally, for 
     and while loops are used to iterate over large amounts of data to perform 
     computations on them, for example calculating the moving averages from the 
-    opening and closing stock prices over 6 months.
+    opening and closing stock prices over 6 months. Initially, we planned to use
+    correlation to measure the relationships between the trendlines, but we determined
+    it was unclear and not as effective as percent error.
 
 	Our results indicated that 1 year was the most effective interval to 
     predict stock momentum with. This was found by calculating percent error 
